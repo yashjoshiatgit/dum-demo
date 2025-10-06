@@ -1,2 +1,0 @@
-# dum-demo
-Learning Git 
