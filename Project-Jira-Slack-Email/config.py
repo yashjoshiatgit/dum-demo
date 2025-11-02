@@ -1,0 +1,30 @@
+import logging
+import os
+
+from dotenv import load_dotenv
+from jira import JIRA
+from langchain_google_genai import ChatGoogleGenerativeAI
+from fastapi import FastAPI
+from slack_bolt import App
+from slack_sdk import WebClient
+from langchain_openai import AzureChatOpenAI
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+load_dotenv()
+
+jira_client = JIRA(
+    server=os.getenv("JIRA_URL"),
+    basic_auth=(os.getenv("JIRA_EMAIL"), os.getenv("JIRA_API_TOKEN")),
+)
+
+llm = AzureChatOpenAI(
+    azure_deployment="gpt-4.1-mini",
+    api_version="2024-12-01-preview",
+    azure_endpoint="https://slack-jira-day-resource.cognitiveservices.azure.com/",
+    api_key=os.getenv("AZURE_API_KEY")
+)
+
+fastapi_app = FastAPI()
+slack_app = App(token=os.getenv("SLACK_BOT_TOKEN"))
+slack_client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
+active_workflows = {}
